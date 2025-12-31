@@ -3,500 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy New Year 2026 Wish</title>
+    <title>Happy New Year 2026</title>
     <style>
-        /* CSS Styling */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;900&family=Great+Vibes&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #000; overflow: hidden; font-family: 'Poppins', sans-serif; color: white; height: 100vh; width: 100vw; position: relative; }
+        
+        /* Fireworks Canvas */
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        body {
-            background-color: #000;
-            overflow: hidden;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-        }
-
-        /* Canvas for Fireworks */
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* Setup Screen (Form) */
-        #setup-screen {
-            position: absolute;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        /* Screens */
+        .screen {
+            position: absolute; z-index: 10; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 1s ease;
         }
 
+        #setup-screen { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+        #receiver-screen { background: linear-gradient(135deg, #200122, #6f0000); display: none; z-index: 15; }
+        #wish-screen { display: none; pointer-events: none; }
+        
+        .interactive-area { pointer-events: auto; text-align: center; display: flex; flex-direction: column; align-items: center; }
+
+        /* Input Card */
         .input-box {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-            width: 90%;
-            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            padding: 30px; border-radius: 20px; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            width: 90%; max-width: 400px;
         }
 
-        h2 {
-            margin-bottom: 20px;
-            font-weight: 600;
-            color: #ffd700;
-        }
+        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 50px; border: none; outline: none; text-align: center; font-size: 16px; }
+        input[type="file"] { margin: 10px 0; color: white; font-size: 0.9rem; }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 50px;
-            border: none;
-            outline: none;
-            text-align: center;
-            font-size: 16px;
-        }
-
-        input[type="file"] {
-            margin: 10px 0;
-            color: white;
-        }
-
+        /* Buttons */
         .btn {
-            background: linear-gradient(45deg, #ff0055, #ff00aa);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 18px;
-            margin-top: 15px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
-            transition: transform 0.2s;
+            background: linear-gradient(45deg, #ff0055, #ff00aa); color: white; padding: 12px 30px;
+            border: none; border-radius: 50px; cursor: pointer; font-size: 18px; margin-top: 15px;
+            font-weight: bold; box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4); animation: pulse 2s infinite;
         }
+        .btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; opacity: 0.7; }
 
-        .btn:active {
-            transform: scale(0.95);
-        }
+        .btn-create-new { background: transparent; border: 2px solid #00ffea; color: #00ffea; padding: 8px 20px; margin-top: 15px; font-size: 14px; }
 
-        /* Main Wish Screen */
-        #wish-screen {
-            position: absolute;
-            z-index: 5;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none; /* Hidden initially */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            pointer-events: none; /* Let clicks pass to canvas */
-        }
+        /* Texts & Effects */
+        .title-text { font-family: 'Great Vibes', cursive; font-size: 4rem; color: #fff; text-shadow: 0 0 10px #ff00de; animation: glow 2s infinite alternate; }
+        .year-text { font-size: 6rem; font-weight: 900; background: -webkit-linear-gradient(#ffe600, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        
+        /* Photo Styling */
+        .photo-wrapper { position: relative; margin: 20px 0; width: 200px; height: 200px; }
+        .user-photo { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 5px solid white; box-shadow: 0 0 30px rgba(255, 255, 255, 0.8); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .scan-ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 3px dashed #00ffea; animation: spin 4s linear infinite; }
+        
+        .sender-name { font-size: 2rem; font-weight: bold; color: #ffd700; text-transform: capitalize; margin-top: 5px; }
+        .whatsapp-btn { margin-top: 20px; background: #25D366; color: white; text-decoration: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; cursor: pointer; border:none; }
+        
+        #loading-msg { display: none; color: #00ffea; margin-top: 15px; font-size: 0.9rem; font-weight: bold;}
 
-        /* Enable pointer events only for buttons */
-        #wish-screen .interactive-area {
-            pointer-events: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .title-text {
-            font-family: 'Great Vibes', cursive;
-            font-size: 4rem;
-            color: #fff;
-            text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 40px #ff00de;
-            animation: glow 2s infinite alternate;
-            margin-bottom: 10px;
-        }
-
-        .year-text {
-            font-size: 6rem;
-            font-weight: 900;
-            background: -webkit-linear-gradient(#ffe600, #ff8c00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0px 5px 15px rgba(255, 140, 0, 0.5);
-            line-height: 1;
-        }
-
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de; }
-            to { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
-        }
-
-        /* Photo Container */
-        .photo-wrapper {
-            position: relative;
-            margin: 20px 0;
-            width: 200px;
-            height: 200px;
-        }
-
-        .user-photo {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid white;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-
-        /* Analysis Animation Ring */
-        .scan-ring {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px dashed #00ffea;
-            box-shadow: 0 0 15px #00ffea;
-            animation: spin 4s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .message {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            color: #eee;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 15px;
-        }
-
-        .sender-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #ffd700;
-            text-transform: capitalize;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
-        }
-
-        /* Share Button */
-        .whatsapp-btn {
-            margin-top: 20px;
-            background: #25D366;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-10px);}
-            60% {transform: translateY(-5px);}
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .title-text { font-size: 3rem; }
-            .year-text { font-size: 4rem; }
-            .user-photo { width: 140px; height: 140px; }
-            .photo-wrapper { width: 160px; height: 160px; }
-        }
-
-        /* Processing Overlay */
-        #processing {
-            display: none;
-            font-size: 1.5rem;
-            color: #00ffea;
-            margin-top: 20px;
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes glow { to { text-shadow: 0 0 20px #00ffff; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @media (max-width: 600px) { .title-text { font-size: 3rem; } .year-text { font-size: 4rem; } }
     </style>
 </head>
 <body>
 
-    <!-- Audio Player -->
-    <audio id="music-player" loop>
-        <source src="Happy.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <!-- Canvas for Fireworks -->
+    <!-- Audio File -->
+    <audio id="music-player" loop><source src="Happy.mp3" type="audio/mpeg"></audio>
+    
+    <!-- Background Fireworks -->
     <canvas id="canvas"></canvas>
 
-    <!-- SETUP SCREEN: User Input -->
-    <div id="setup-screen">
+    <!-- 1. SETUP SCREEN (For Creator) -->
+    <div id="setup-screen" class="screen">
         <div class="input-box">
-            <h1 style="font-family: 'Great Vibes'; font-size: 3rem; margin-bottom: 10px;">Welcome</h1>
+            <h1 style="font-family: 'Great Vibes'; font-size: 2.5rem; margin-bottom: 10px;">Welcome</h1>
             <p>Create your magic wish for 2026!</p>
-            <br>
             <input type="text" id="username" placeholder="Enter Your Name" required>
-            <br>
-            <label style="display:block; margin-top:10px; font-size:0.9rem;">Upload Your Best Photo:</label>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: #ccc;">Select Your Photo:</p>
             <input type="file" id="userimg" accept="image/*">
-            <br>
-            <div id="processing">Analysing Photo... 📸</div>
-            <button class="btn" onclick="startExperience()">Create Wish ✨</button>
+            <div id="loading-msg">Uploading Photo... Please wait ⏳</div>
+            <button class="btn" id="create-btn" onclick="processUserWish()">Create Status ✨</button>
         </div>
     </div>
 
-    <!-- WISH SCREEN: Final Output -->
-    <div id="wish-screen">
+    <!-- 2. RECEIVER SCREEN (For Viewer) -->
+    <div id="receiver-screen" class="screen">
+        <div class="input-box">
+            <h1 style="font-family: 'Great Vibes'; font-size: 2.5rem; color:#ffd700;">Surprise! 🎁</h1>
+            <p style="font-size: 1.2rem; margin: 15px 0;">
+                <span id="sender-display-name" style="font-weight:bold; color: #00ffea;">Someone</span>
+                has sent you a special New Year wish!
+            </p>
+            <button class="btn" onclick="openReceivedWish()">Open Wish 🔓</button>
+        </div>
+    </div>
+
+    <!-- 3. FINAL WISH SCREEN (The Status) -->
+    <div id="wish-screen" class="screen">
         <div class="title-text">Happy New Year</div>
         <div class="year-text">2026</div>
 
         <div class="interactive-area">
             <div class="photo-wrapper">
                 <div class="scan-ring"></div>
-                <img src="https://via.placeholder.com/150" id="final-photo" class="user-photo" alt="User Photo">
+                <!-- Default Image placeholder -->
+                <img src="https://cdn-icons-png.flaticon.com/512/4213/4213518.png" id="final-photo" class="user-photo" alt="Photo">
             </div>
 
-            <div class="message">Wishing you love & joy!</div>
-            <div class="message">From:</div>
-            <div class="sender-name" id="display-name">Your Name</div>
+            <div style="background: rgba(0,0,0,0.6); padding: 5px 20px; border-radius: 20px;">
+                <div style="color: #eee; font-size: 0.9rem;">Wishing you joy & success!</div>
+                <div style="color: #bbb; font-size: 0.8rem;">From:</div>
+                <div class="sender-name" id="final-name">Name</div>
+            </div>
 
-            <a href="#" class="whatsapp-btn" id="share-btn" onclick="shareOnWhatsApp()">
-                Share on WhatsApp 🚀
-            </a>
-            
-            <p style="font-size: 0.8rem; margin-top: 10px; color: #aaa;">(Tap anywhere for Fireworks!)</p>
+            <button class="whatsapp-btn" id="share-btn" onclick="shareOnWhatsApp()">Share on WhatsApp 🚀</button>
+            <button class="btn btn-create-new" id="create-new-btn" onclick="resetToHome()" style="display:none;">Create Your Own ➕</button>
         </div>
     </div>
 
     <script>
-        // --- LOGIC SECTION ---
+        // ==========================================
+        //  YOUR API KEY IS HERE
+        // ==========================================
+        const IMGBB_API_KEY = "e2e1a14ef34ed25e0344727a71f65a6d"; 
+        // ==========================================
 
-        const setupScreen = document.getElementById('setup-screen');
-        const wishScreen = document.getElementById('wish-screen');
-        const processing = document.getElementById('processing');
         const music = document.getElementById('music-player');
+        const setupScreen = document.getElementById('setup-screen');
+        const receiverScreen = document.getElementById('receiver-screen');
+        const wishScreen = document.getElementById('wish-screen');
+        const loadingMsg = document.getElementById('loading-msg');
+        const createBtn = document.getElementById('create-btn');
         
-        let userName = "";
-        let userImageSrc = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; // Default Avatar
+        let currentName = "";
+        let currentPhotoUrl = "https://cdn-icons-png.flaticon.com/512/4213/4213518.png"; // Default image
 
-        // 1. Check URL on Load (Is user coming from a shared link?)
+        // --- 1. CHECK URL ON LOAD ---
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const sender = urlParams.get('from');
-            
-            if(sender) {
-                // If viewing someone else's status
-                userName = decodeURIComponent(sender);
-                document.getElementById('display-name').innerText = userName;
+            const senderName = urlParams.get('n');
+            const senderImg = urlParams.get('img');
+
+            if (senderName) {
+                // VIEWER MODE (Dost dekh raha hai)
+                currentName = decodeURIComponent(senderName);
+                if(senderImg) currentPhotoUrl = decodeURIComponent(senderImg);
                 
-                // Change UI for Viewer
-                document.querySelector('#setup-screen h1').innerText = "Surprise!";
-                document.querySelector('#setup-screen p').innerText = userName + " sent you a wish!";
-                document.querySelector('.btn').innerText = "Open Wish 🎁";
+                // Form mat dikhao, Surprise box dikhao
+                setupScreen.style.display = 'none';
+                receiverScreen.style.display = 'flex';
                 
-                // Hide input fields initially to just show "Open" button logic, 
-                // but for simplicity, we allow them to override creates their own later.
-                // We will pre-fill the name if they want to reply.
+                // Update DOM elements
+                document.getElementById('sender-display-name').innerText = currentName;
+                document.getElementById('final-name').innerText = currentName;
+                document.getElementById('final-photo').src = currentPhotoUrl;
+                
+                // Show 'Create New' button, hide 'Share' button initially
+                document.getElementById('create-new-btn').style.display = 'inline-block';
+                document.getElementById('share-btn').style.display = 'none';
+            } else {
+                // CREATOR MODE (Aap bana rahe ho)
+                setupScreen.style.display = 'flex';
             }
         };
 
-        // 2. Start Experience Function
-        function startExperience() {
+        // --- 2. UPLOAD TO IMGBB ---
+        function processUserWish() {
             const nameInput = document.getElementById('username').value;
             const fileInput = document.getElementById('userimg').files[0];
-            const urlParams = new URLSearchParams(window.location.search);
-            const sender = urlParams.get('from');
 
-            // If user entered a name, use it. If came from link and no input, use sender name.
-            if (nameInput.trim() !== "") {
-                userName = nameInput;
-            } else if (sender) {
-                userName = sender;
-            } else {
-                alert("Please enter your name!");
-                return;
-            }
+            if (!nameInput) { alert("Please enter your name!"); return; }
+            currentName = nameInput;
+            document.getElementById('final-name').innerText = currentName;
 
-            // Image Handling
             if (fileInput) {
-                // User uploaded a photo - Simulate "Analysis"
-                processing.style.display = 'block';
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    userImageSrc = e.target.result;
-                    launchWish(true);
-                };
-                reader.readAsDataURL(fileInput);
+                // Upload Animation Start
+                loadingMsg.style.display = 'block';
+                createBtn.disabled = true;
+                createBtn.innerText = "Processing...";
+
+                const formData = new FormData();
+                formData.append("image", fileInput);
+
+                // Sending to ImgBB
+                fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        currentPhotoUrl = result.data.url; // Hamko Link mil gaya!
+                        document.getElementById('final-photo').src = currentPhotoUrl;
+                        showWishScreen();
+                    } else {
+                        alert("Photo upload failed. Please try a different photo.");
+                        resetForm();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Internet Connection Error. Photo upload failed.");
+                    resetForm();
+                });
             } else {
-                // No photo uploaded, proceed immediately
-                launchWish(false);
+                // No photo uploaded, use default
+                showWishScreen();
             }
         }
 
-        function launchWish(hasPhoto) {
-            // Wait a bit if analyzing photo
-            const delay = hasPhoto ? 1500 : 500;
+        function resetForm() {
+            loadingMsg.style.display = 'none';
+            createBtn.disabled = false;
+            createBtn.innerText = "Create Status ✨";
+        }
 
+        // --- 3. TRANSITIONS & MUSIC ---
+        function showWishScreen() {
+            playMusic();
+            setupScreen.style.opacity = '0';
             setTimeout(() => {
-                // Play Music (User Interaction happened)
-                music.play().catch(e => console.log("Audio play failed: ", e));
-
-                // Update DOM
-                document.getElementById('final-photo').src = userImageSrc;
-                document.getElementById('display-name').innerText = userName;
-
-                // Transition
-                setupScreen.style.opacity = '0';
-                setTimeout(() => {
-                    setupScreen.style.display = 'none';
-                    wishScreen.style.display = 'flex';
-                }, 1000);
-
-            }, delay);
+                setupScreen.style.display = 'none';
+                wishScreen.style.display = 'flex';
+            }, 500);
         }
 
-        // 3. Share Function
+        function openReceivedWish() {
+            playMusic();
+            receiverScreen.style.opacity = '0';
+            setTimeout(() => {
+                receiverScreen.style.display = 'none';
+                wishScreen.style.display = 'flex';
+            }, 500);
+        }
+
+        function playMusic() {
+            music.play().catch(e => console.log("User interaction needed for music"));
+        }
+
+        // --- 4. WHATSAPP SHARING ---
         function shareOnWhatsApp() {
-            // We create a link that includes the current user's name
             const baseUrl = window.location.href.split('?')[0];
-            const link = `${baseUrl}?from=${encodeURIComponent(userName)}`;
-            const msg = `*${userName}* ne aapke liye ek Special 2026 Surprise bheja hai! ✨👇\n\nSee here: ${link}`;
+            // Encode name and photo URL
+            const shareLink = `${baseUrl}?n=${encodeURIComponent(currentName)}&img=${encodeURIComponent(currentPhotoUrl)}`;
             
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-            window.open(whatsappUrl, '_blank');
+            const msg = `*${currentName}* ne aapke liye ek Special New Year Wish bheji hai! 🎁✨👇\n\nOpen here: ${shareLink}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // --- FIREWORKS ENGINE (Canvas) ---
-        
+        function resetToHome() {
+            window.location.href = window.location.href.split('?')[0];
+        }
+
+        // --- 5. FIREWORKS ENGINE ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
-        let w, h;
-        let particles = [];
+        let w, h, particles = [];
+        
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        window.addEventListener("resize", resize); resize();
 
-        function resize() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-        }
-        window.addEventListener("resize", resize);
-        resize();
-
-        function random(min, max) {
-            return Math.random() * (max - min) + min;
-        }
+        function random(min, max) { return Math.random() * (max - min) + min; }
 
         class Particle {
             constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                // Explosion velocity
-                const angle = random(0, Math.PI * 2);
-                const speed = random(2, 6);
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
-                this.alpha = 1;
-                this.gravity = 0.05;
-                this.friction = 0.98;
+                this.x = x; this.y = y; this.color = color;
+                const angle = random(0, Math.PI * 2); const speed = random(2, 6);
+                this.vx = Math.cos(angle) * speed; this.vy = Math.sin(angle) * speed;
+                this.alpha = 1; this.gravity = 0.05; this.friction = 0.98;
             }
-
-            update() {
-                this.vx *= this.friction;
-                this.vy *= this.friction;
-                this.vy += this.gravity;
-                this.x += this.vx;
-                this.y += this.vy;
-                this.alpha -= 0.015;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
+            update() { this.vx *= this.friction; this.vy *= this.friction; this.vy += this.gravity; this.x += this.vx; this.y += this.vy; this.alpha -= 0.015; }
+            draw() { ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, 3, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
         }
 
         function createExplosion(x, y) {
             const colors = ['#ff0044', '#00ffea', '#ffeb3b', '#00ff44', '#ff00cc'];
             const color = colors[Math.floor(random(0, colors.length))];
-            for (let i = 0; i < 40; i++) {
-                particles.push(new Particle(x, y, color));
-            }
+            for (let i = 0; i < 30; i++) particles.push(new Particle(x, y, color));
         }
 
-        // Animation Loop
         function animate() {
-            // Semi-transparent background for trail effect
-            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-            ctx.fillRect(0, 0, w, h);
-
-            particles.forEach((p, index) => {
-                p.update();
-                p.draw();
-                if (p.alpha <= 0) particles.splice(index, 1);
-            });
-
-            // Random Auto Fireworks at edges
-            if (Math.random() < 0.05) { // 5% chance per frame
-                const side = Math.random() > 0.5 ? 0 : w;
-                createExplosion(side, random(0, h));
-            }
-
+            ctx.fillStyle = "rgba(0, 0, 0, 0.2)"; ctx.fillRect(0, 0, w, h);
+            particles.forEach((p, i) => { p.update(); p.draw(); if (p.alpha <= 0) particles.splice(i, 1); });
+            if (Math.random() < 0.05) createExplosion(Math.random() > 0.5 ? 0 : w, random(0, h));
             requestAnimationFrame(animate);
         }
         animate();
 
-        // Touch/Click Interaction
-        function handleInput(e) {
-            // Prevent interaction on buttons
-            if(e.target.closest('.whatsapp-btn') || e.target.closest('.btn') || e.target.closest('input')) return;
-
-            let x, y;
-            if(e.type === 'touchstart') {
-                x = e.touches[0].clientX;
-                y = e.touches[0].clientY;
-            } else {
-                x = e.clientX;
-                y = e.clientY;
-            }
-            createExplosion(x, y);
-            
-            // Play sound effect if desired (optional)
-        }
-
-        window.addEventListener('mousedown', handleInput);
-        window.addEventListener('touchstart', handleInput);
-
+        // Touch Interaction
+        window.addEventListener('mousedown', e => { if(!e.target.closest('button') && !e.target.closest('input')) createExplosion(e.clientX, e.clientY); });
+        window.addEventListener('touchstart', e => { if(!e.target.closest('button') && !e.target.closest('input')) createExplosion(e.touches[0].clientX, e.touches[0].clientY); });
     </script>
 </body>
 </html>
